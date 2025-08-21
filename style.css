@@ -1,0 +1,334 @@
+/* Variables de color IHF */
+:root {
+    --ihf-blue: #003366; /* Azul oscuro principal */
+    --ihf-red: #CC0000;   /* Rojo vibrante */
+    --ihf-white: #FFFFFF; /* Blanco */
+    --ihf-light-gray: #F0F0F0; /* Gris claro para fondos */
+    --ihf-dark-gray: #333333;  /* Gris oscuro para texto */
+    --ihf-accent-blue: #007bff; /* Un azul más brillante para acentos */
+}
+
+/* Estilos Generales */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--ihf-light-gray);
+    color: var(--ihf-dark-gray);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Cabecera IHF */
+.ihf-header {
+    background-color: var(--ihf-blue);
+    color: var(--ihf-white);
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra el contenido del header */
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+}
+
+.ihf-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.ihf-logo {
+    height: 60px; /* Ajusta el tamaño del logo */
+    margin-right: 20px;
+}
+
+.ihf-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    flex-grow: 1; /* Permite que el título ocupe espacio */
+    text-align: center; /* Centra el título */
+}
+
+.ihf-header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centra los elementos de navegación */
+}
+
+.ihf-header nav ul li {
+    margin-left: 25px;
+}
+
+.ihf-header nav ul li a {
+    color: var(--ihf-white);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    padding: 5px 0;
+    position: relative;
+}
+
+.ihf-header nav ul li a:hover,
+.ihf-header nav ul li a.active-nav {
+    color: var(--ihf-red);
+}
+
+.ihf-header nav ul li a.active-nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    height: 3px;
+    background-color: var(--ihf-red);
+}
+
+/* Secciones de Contenido */
+.content-section {
+    background-color: var(--ihf-white);
+    padding: 30px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: none; /* Oculta todas las secciones por defecto */
+}
+
+.content-section.active {
+    display: block; /* Muestra la sección activa */
+}
+
+.content-section h2 {
+    color: var(--ihf-blue);
+    border-bottom: 2px solid var(--ihf-red);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+}
+
+/* Botones */
+.btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: none;
+    margin-right: 15px;
+    margin-top: 15px;
+}
+
+.btn-primary {
+    background-color: var(--ihf-red);
+    color: var(--ihf-white);
+}
+
+.btn-primary:hover {
+    background-color: #A00000; /* Rojo más oscuro al pasar el ratón */
+}
+
+.btn-secondary {
+    background-color: var(--ihf-blue);
+    color: var(--ihf-white);
+}
+
+.btn-secondary:hover {
+    background-color: #002244; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Sección de Reglas */
+.rule-navigation {
+    margin-bottom: 20px;
+}
+
+.rule-navigation label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.rule-navigation select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+.rule-content h3 {
+    color: var(--ihf-dark-gray);
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.rule-content p {
+    margin-bottom: 10px;
+}
+
+.rule-content ul {
+    list-style: disc;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.rule-content li {
+    margin-bottom: 5px;
+}
+
+/* Sección de Cuestionario */
+.quiz-area {
+    margin-top: 20px;
+    border: 1px solid var(--ihf-light-gray);
+    border-radius: 8px;
+    padding: 20px;
+    background-color: var(--ihf-light-gray);
+}
+
+.question-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--ihf-white);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.question-container h3 {
+    color: var(--ihf-blue);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+}
+
+.options-list li {
+    margin-bottom: 10px;
+}
+
+.options-list label {
+    display: block;
+    background-color: #f9f9f9;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid #ddd;
+}
+
+.options-list label:hover {
+    background-color: #e9e9e9;
+}
+
+.options-list input[type="radio"] {
+    margin-right: 10px;
+}
+
+.quiz-feedback {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.quiz-feedback.correct {
+    background-color: #d4edda; /* Verde claro */
+    color: #155724; /* Verde oscuro */
+}
+
+.quiz-feedback.incorrect {
+    background-color: #f8d7da; /* Rojo claro */
+    color: #721c24; /* Rojo oscuro */
+}
+
+.quiz-results {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--ihf-white);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.quiz-results h3 {
+    color: var(--ihf-blue);
+    margin-top: 0;
+}
+
+.quiz-results p {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+/* Pie de página IHF */
+.ihf-footer {
+    background-color: var(--ihf-dark-gray);
+    color: var(--ihf-white);
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ihf-header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .ihf-logo {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .ihf-header h1 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .ihf-header nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ihf-header nav ul li {
+        margin: 5px 0;
+    }
+
+    .btn-primary, .btn-secondary {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .rule-navigation select {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .content-section {
+        padding: 20px;
+    }
+
+    .ihf-header h1 {
+        font-size: 1.3em;
+    }
+}

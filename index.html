@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglas de Juego IHF - Estudio Interactivo</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="ihf-header">
+        <div class="container">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/International_Handball_Federation_logo.svg/1200px-International_Handball_Federation_logo.svg.png" alt="Logo IHF" class="ihf-logo">
+            <h1>Reglas de Juego IHF</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" data-section="home">Inicio</a></li>
+                    <li><a href="#" data-section="rules">Reglas</a></li>
+                    <li><a href="#" data-section="quiz">Cuestionario</a></li>
+                    <li><a href="#" data-section="about">Acerca de</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home-section" class="content-section active">
+            <h2>Bienvenido al Estudio Interactivo de las Reglas de Juego IHF</h2>
+            <p>Aquí podrás aprender, repasar y evaluar tus conocimientos sobre las reglas de juego de la Federación Internacional de Balonmano, válidas a partir del 1 de julio de 2024.</p>
+            <p>¡Prepárate para dominar cada aspecto del juego!</p>
+            <button class="btn-primary" data-navigate="rules">Explorar Reglas</button>
+            <button class="btn-secondary" data-navigate="quiz">Iniciar Cuestionario</button>
+        </section>
+
+        <section id="rules-section" class="content-section">
+            <h2>Explorar Reglas</h2>
+            <div class="rule-navigation">
+                <label for="rule-select">Seleccionar Regla:</label>
+                <select id="rule-select"></select>
+            </div>
+            <div id="rule-content" class="rule-content">
+                <!-- El contenido de la regla se cargará aquí dinámicamente -->
+            </div>
+        </section>
+
+        <section id="quiz-section" class="content-section">
+            <h2>Cuestionario Interactivo</h2>
+            <div id="quiz-controls">
+                <label for="quiz-rule-select">Seleccionar Regla para Cuestionario (Opcional):</label>
+                <select id="quiz-rule-select"></select>
+                <button class="btn-primary" id="start-quiz-btn">Iniciar Cuestionario</button>
+            </div>
+            <div id="quiz-area" class="quiz-area">
+                <div id="question-container" class="question-container">
+                    <!-- Las preguntas del cuestionario se cargarán aquí -->
+                </div>
+                <div id="quiz-feedback" class="quiz-feedback"></div>
+                <button class="btn-primary" id="next-question-btn" style="display: none;">Siguiente Pregunta</button>
+                <div id="quiz-results" class="quiz-results" style="display: none;"></div>
+            </div>
+        </section>
+
+        <section id="about-section" class="content-section">
+            <h2>Acerca de</h2>
+            <p>Esta aplicación ha sido creada para facilitar el estudio y la comprensión de las Reglas de Juego de la IHF, válidas a partir del 1 de julio de 2024.</p>
+            <p>Desarrollado con pasión por el balonmano y el aprendizaje interactivo.</p>
+            <p>Fecha de publicación del catálogo: Mayo de 2024.</p>
+        </section>
+    </main>
+
+    <footer class="ihf-footer">
+        <div class="container">
+            <p>&copy; 2024 Reglas de Juego IHF. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
