@@ -1311,12 +1311,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // Si se navega a reglas y hay una regla seleccionada, mostrar su contenido
         if (sectionName === 'rules' && ruleSelect.value) {
             showRuleContent(ruleSelect.value);
         }
     }
 
-   function loadRules() {
+    // Cargar las reglas en el selector
+    function loadRules() {
         // Agregar opción por defecto
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
@@ -1359,13 +1361,17 @@ document.addEventListener('DOMContentLoaded', () => {
         ruleData.forEach((item, index) => {
             const questionElement = document.createElement('div');
             questionElement.className = 'rule-item';
+            
+            // Manejar respuestas múltiples
+            const correctAnswers = Array.isArray(item.answer_es) ? item.answer_es : [item.answer_es];
+            
             questionElement.innerHTML = `
                 <h4>Pregunta ${index + 1}:</h4>
                 <p><strong>${item.question_es}</strong></p>
                 <ul class="options-list">
                     ${item.options_es.map(option => `<li>${option}</li>`).join('')}
                 </ul>
-                <p class="correct-answer"><strong>Respuesta correcta:</strong> ${item.answer_es}</p>
+                <p class="correct-answer"><strong>Respuestas correctas:</strong> ${correctAnswers.join(', ')}</p>
             `;
             ruleContentDiv.appendChild(questionElement);
         });
@@ -1427,7 +1433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 optionDiv.className = 'quiz-option';
                 optionDiv.innerHTML = `
                     <label>
-                        <input type="radio" name="quiz-option" value="${option}">
+                        <input type="checkbox" name="quiz-option" value="${option}">
                         <span class="option-text">${option}</span>
                     </label>
                 `;
@@ -1453,47 +1459,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Evaluar la respuesta
     function evaluateAnswer() {
-        const selectedOption = document.querySelector('input[name="quiz-option"]:checked');
-        if (selectedOption) {
-            const answer = selectedOption.value;
-            const correctAnswer = currentQuizQuestions[currentQuestionIndex].answer_es;
-            
-            // Deshabilitar todas las opciones
-            const allOptions = document.querySelectorAll('input[name="quiz-option"]');
-            allOptions.forEach(option => option.disabled = true);
-            
-            // Ocultar botón de evaluar
-            const evaluateBtn = document.querySelector('.evaluate-btn');
-            if (evaluateBtn) evaluateBtn.style.display = 'none';
-            
-            if (answer === correctAnswer) {
-                correctAnswersCount++;
-                quizFeedback.textContent = '¡Correcto! ✓';
-                quizFeedback.className = 'quiz-feedback correct';
-                selectedOption.parentElement.parentElement.classList.add('correct-option');
-            } else {
-                quizFeedback.textContent = `Incorrecto. ✗ La respuesta correcta es: ${correctAnswer}`;
-                quizFeedback.className = 'quiz-feedback incorrect';
-                selectedOption.parentElement.parentElement.classList.add('incorrect-option');
-                
-                // Marcar la respuesta correcta
-                allOptions.forEach(option => {
-                    if (option.value === correctAnswer) {
-                        option.parentElement.parentElement.classList.add('correct-option');
-                    }
-                });
-            }
-            
-            // Mostrar botón siguiente
-            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-                nextQuestionBtn.textContent = 'Siguiente Pregunta';
-            } else {
-                nextQuestionBtn.textContent = 'Ver Resultados';
-            }
-            nextQuestionBtn.style.display = 'block';
-        } else {
-            alert('Por favor, selecciona una respuesta.');
+        const selectedOptions = document.querySelectorAll('input[name="quiz-option"]:checked');
+        if (selectedOptions.length === 0) {
+            alert('Por favor, selecciona al menos una respuesta.');
+            return;
         }
+
+        const selectedValues = Array.from(selectedOptions).map(option => option.value);
+        const correctAnswers = Array.isArray(currentQuizQuestions[currentQuestionIndex].answer_es) 
+            ? currentQuizQuestions[currentQuestionIndex].answer_es 
+            : [currentQuizQuestions[currentQuestionIndex].answer_es];
+        
+        // Deshabilitar todas las opciones
+        const allOptions = document.querySelectorAll('input[name="quiz-option"]');
+        allOptions.forEach(option => option.disabled = true);
+        
+        // Ocultar botón de evaluar
+        const evaluateBtn = document.querySelector('.evaluate-btn');
+        if (evaluateBtn) evaluateBtn.style.display = 'none';
+        
+        // Verificar si la respuesta es completamente correcta
+        const isCorrect = selectedValues.length === correctAnswers.length && 
+            selectedValues.every(value => correctAnswers.includes(value)) &&
+            correctAnswers.every(answer => selectedValues.includes(answer));
+        
+        // Marcar opciones
+        allOptions.forEach(option => {
+            const optionDiv = option.parentElement.parentElement;
+            const isSelectedCorrect = selectedValues.includes(option.value) && correctAnswers.includes(option.value);
+            const isSelectedIncorrect = selectedValues.includes(option.value) && !correctAnswers.includes(option.value);
+            const isUnselectedCorrect = !selectedValues.includes(option.value) && correctAnswers.includes(option.value);
+            
+            if (isSelectedCorrect) {
+                optionDiv.classList.add('correct-selected');
+            } else if (isSelectedIncorrect) {
+                optionDiv.classList.add('incorrect-selected');
+            } else if (isUnselectedCorrect) {
+                optionDiv.classList.add('correct-unselected');
+            }
+        });
+        
+        if (isCorrect) {
+            correctAnswersCount++;
+            quizFeedback.textContent = '¡Completamente correcto! ✓ Seleccionaste todas las opciones correctas.';
+            quizFeedback.className = 'quiz-feedback correct';
+        } else {
+            let feedbackText = 'Incorrecto. ✗\n';
+            
+            // Mostrar respuestas que faltaron
+            const missedCorrect = correctAnswers.filter(answer => !selectedValues.includes(answer));
+            if (missedCorrect.length > 0) {
+                feedbackText += `Te faltaron: ${missedCorrect.join(', ')}\n`;
+            }
+            
+            // Mostrar respuestas incorrectas seleccionadas
+            const incorrectSelected = selectedValues.filter(value => !correctAnswers.includes(value));
+            if (incorrectSelected.length > 0) {
+                feedbackText += `Seleccionaste incorrectamente: ${incorrectSelected.join(', ')}\n`;
+            }
+            
+            feedbackText += `\nRespuestas correctas completas: ${correctAnswers.join(', ')}`;
+            
+            quizFeedback.textContent = feedbackText;
+            quizFeedback.className = 'quiz-feedback incorrect';
+        }
+        
+        // Mostrar botón siguiente
+        if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+            nextQuestionBtn.textContent = 'Siguiente Pregunta';
+        } else {
+            nextQuestionBtn.textContent = 'Ver Resultados';
+        }
+        nextQuestionBtn.style.display = 'block';
     }
 
     // Mostrar resultados del cuestionario
@@ -1566,253 +1603,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ruleSelect.value) {
         showRuleContent(ruleSelect.value);
     }
-});function loadRules() {
-        // Agregar opción por defecto
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Selecciona una regla...';
-        ruleSelect.appendChild(defaultOption);
-        
-        const defaultQuizOption = document.createElement('option');
-        defaultQuizOption.value = '';
-        defaultQuizOption.textContent = 'Todas las reglas (aleatorio)';
-        quizRuleSelect.appendChild(defaultQuizOption);
-
-        for (const rule in catalogData) {
-            const option = document.createElement('option');
-            option.value = rule;
-            option.textContent = rule;
-            ruleSelect.appendChild(option);
-            
-            const quizOption = document.createElement('option');
-            quizOption.value = rule;
-            quizOption.textContent = rule;
-            quizRuleSelect.appendChild(quizOption);
-        }
-    }
-
-    // Mostrar contenido de la regla seleccionada
-    function showRuleContent(rule) {
-        if (!rule) {
-            ruleContentDiv.innerHTML = '<p>Selecciona una regla para ver su contenido.</p>';
-            return;
-        }
-        
-        const ruleData = catalogData[rule];
-        if (!ruleData) {
-            ruleContentDiv.innerHTML = '<p>No se encontró contenido para esta regla.</p>';
-            return;
-        }
-        
-        ruleContentDiv.innerHTML = `<h3>${rule}</h3>`; // Mostrar título de la regla
-        
-        ruleData.forEach((item, index) => {
-            const questionElement = document.createElement('div');
-            questionElement.className = 'rule-item';
-            questionElement.innerHTML = `
-                <h4>Pregunta ${index + 1}:</h4>
-                <p><strong>${item.question_es}</strong></p>
-                <ul class="options-list">
-                    ${item.options_es.map(option => `<li>${option}</li>`).join('')}
-                </ul>
-                <p class="correct-answer"><strong>Respuesta correcta:</strong> ${item.answer_es}</p>
-            `;
-            ruleContentDiv.appendChild(questionElement);
-        });
-    }
-
-    // Iniciar el cuestionario
-    function startQuiz() {
-        const selectedRule = quizRuleSelect.value;
-        
-        if (selectedRule === '') {
-            // Si no se selecciona regla específica, mezclar todas las preguntas
-            currentQuizQuestions = [];
-            for (const rule in catalogData) {
-                currentQuizQuestions = currentQuizQuestions.concat(catalogData[rule]);
-            }
-            // Mezclar preguntas aleatoriamente
-            currentQuizQuestions = shuffleArray(currentQuizQuestions);
-        } else {
-            currentQuizQuestions = [...catalogData[selectedRule]];
-        }
-        
-        if (currentQuizQuestions.length === 0) {
-            alert('No hay preguntas disponibles para el cuestionario.');
-            return;
-        }
-        
-        currentQuestionIndex = 0;
-        correctAnswersCount = 0;
-        quizResultsDiv.style.display = 'none';
-        showNextQuestion();
-    }
-
-    // Función para mezclar array aleatoriamente
-    function shuffleArray(array) {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-    }
-
-    // Mostrar la siguiente pregunta del cuestionario
-    function showNextQuestion() {
-        if (currentQuestionIndex < currentQuizQuestions.length) {
-            const question = currentQuizQuestions[currentQuestionIndex];
-            questionContainer.innerHTML = `
-                <div class="question-header">
-                    <h3>Pregunta ${currentQuestionIndex + 1} de ${currentQuizQuestions.length}</h3>
-                    <p class="question-text">${question.question_es}</p>
-                </div>
-            `;
-            
-            const optionsList = document.createElement('div');
-            optionsList.className = 'quiz-options';
-            
-            question.options_es.forEach((option, index) => {
-                const optionDiv = document.createElement('div');
-                optionDiv.className = 'quiz-option';
-                optionDiv.innerHTML = `
-                    <label>
-                        <input type="radio" name="quiz-option" value="${option}">
-                        <span class="option-text">${option}</span>
-                    </label>
-                `;
-                optionsList.appendChild(optionDiv);
-            });
-            
-            questionContainer.appendChild(optionsList);
-            
-            // Agregar botón de evaluar
-            const evaluateBtn = document.createElement('button');
-            evaluateBtn.textContent = 'Evaluar Respuesta';
-            evaluateBtn.className = 'btn-secondary evaluate-btn';
-            evaluateBtn.addEventListener('click', evaluateAnswer);
-            questionContainer.appendChild(evaluateBtn);
-            
-            quizFeedback.textContent = '';
-            quizFeedback.className = 'quiz-feedback';
-            nextQuestionBtn.style.display = 'none';
-        } else {
-            showResults();
-        }
-    }
-
-    // Evaluar la respuesta
-    function evaluateAnswer() {
-        const selectedOption = document.querySelector('input[name="quiz-option"]:checked');
-        if (selectedOption) {
-            const answer = selectedOption.value;
-            const correctAnswer = currentQuizQuestions[currentQuestionIndex].answer_es;
-            
-            // Deshabilitar todas las opciones
-            const allOptions = document.querySelectorAll('input[name="quiz-option"]');
-            allOptions.forEach(option => option.disabled = true);
-            
-            // Ocultar botón de evaluar
-            const evaluateBtn = document.querySelector('.evaluate-btn');
-            if (evaluateBtn) evaluateBtn.style.display = 'none';
-            
-            if (answer === correctAnswer) {
-                correctAnswersCount++;
-                quizFeedback.textContent = '¡Correcto! ✓';
-                quizFeedback.className = 'quiz-feedback correct';
-                selectedOption.parentElement.parentElement.classList.add('correct-option');
-            } else {
-                quizFeedback.textContent = `Incorrecto. ✗ La respuesta correcta es: ${correctAnswer}`;
-                quizFeedback.className = 'quiz-feedback incorrect';
-                selectedOption.parentElement.parentElement.classList.add('incorrect-option');
-                
-                // Marcar la respuesta correcta
-                allOptions.forEach(option => {
-                    if (option.value === correctAnswer) {
-                        option.parentElement.parentElement.classList.add('correct-option');
-                    }
-                });
-            }
-            
-            // Mostrar botón siguiente
-            if (currentQuestionIndex < currentQuizQuestions.length - 1) {
-                nextQuestionBtn.textContent = 'Siguiente Pregunta';
-            } else {
-                nextQuestionBtn.textContent = 'Ver Resultados';
-            }
-            nextQuestionBtn.style.display = 'block';
-        } else {
-            alert('Por favor, selecciona una respuesta.');
-        }
-    }
-
-    // Mostrar resultados del cuestionario
-    function showResults() {
-        const percentage = Math.round((correctAnswersCount / currentQuizQuestions.length) * 100);
-        let performanceMessage = '';
-        
-        if (percentage >= 80) {
-            performanceMessage = '¡Excelente conocimiento de las reglas!';
-        } else if (percentage >= 60) {
-            performanceMessage = 'Buen conocimiento, pero puedes mejorar.';
-        } else {
-            performanceMessage = 'Necesitas estudiar más las reglas.';
-        }
-        
-        questionContainer.innerHTML = '';
-        quizResultsDiv.innerHTML = `
-            <div class="results-content">
-                <h3>🏆 Resultados del Cuestionario</h3>
-                <div class="score">
-                    <p class="score-text">Respuestas correctas: <strong>${correctAnswersCount}</strong> de <strong>${currentQuizQuestions.length}</strong></p>
-                    <p class="percentage">Porcentaje: <strong>${percentage}%</strong></p>
-                    <p class="performance">${performanceMessage}</p>
-                </div>
-                <div class="results-actions">
-                    <button class="btn-primary" onclick="location.reload()">Nuevo Cuestionario</button>
-                    <button class="btn-secondary" onclick="document.querySelector('[data-section=\\'rules\\']').click()">Estudiar Reglas</button>
-                </div>
-            </div>
-        `;
-        quizResultsDiv.style.display = 'block';
-        nextQuestionBtn.style.display = 'none';
-    }
-
-    // Navegación entre secciones (enlaces del menú)
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const section = e.target.getAttribute('data-section');
-            showSection(section);
-        });
-    });
-
-    // Navegación con botones data-navigate
-    navigateButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const section = e.target.getAttribute('data-navigate');
-            showSection(section);
-        });
-    });
-
-    // Cargar reglas al inicio
-    loadRules();
-
-    // Eventos de cambio en el selector de reglas
-    ruleSelect.addEventListener('change', (e) => {
-        showRuleContent(e.target.value);
-    });
-
-    // Iniciar cuestionario
-    startQuizBtn.addEventListener('click', startQuiz);
-    
-    // Siguiente pregunta
-    nextQuestionBtn.addEventListener('click', () => {
-        currentQuestionIndex++;
-        showNextQuestion();
-    });
-
-    // Mostrar contenido inicial de reglas si hay alguna seleccionada
-    if (ruleSelect.value) {
-        showRuleContent(ruleSelect.value);
-    }
+});
